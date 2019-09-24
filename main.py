@@ -1,28 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import random
+from random import choice
 from logzero import logger
-
-from telegram import ParseMode
 from telegram.ext import CommandHandler, Updater
-
-
-facts = []
-f = open('facts.txt', mode='r')
-fact_lines = f.readlines()
-f.close()
-
-for fact in fact_lines:
-    facts += [fact]
 
 
 def start(update, context):
     update.message.reply_text('Hi! Send /fact to get a fact about BTS.')
-
-
-def error(update, context):
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def send_help(update, context):
@@ -30,19 +15,28 @@ def send_help(update, context):
     logger.info('Sending help...')
     context.bot.sendMessage(
         chat_id,
-        'Get the hottest BTS fact delivered right to your inbox with /fact!',
-        parse_mode=ParseMode.MARKDOWN)
+        'Get the hottest BTS fact delivered right to your inbox with /fact!')
 
 
 def get_random_fact():
-    return random.choice(facts)
+    f = open('facts.txt', mode='r')
+    fact_lines = f.readlines()
+    f.close()
+    facts = []
+    for fact in fact_lines:
+        facts += [fact]
+    return choice(facts)
 
 
 def send_fact(update, context):
     chat_id = update.message.chat_id
-    fact = get_random_fact()
-    logger.info("Sending fact to " + str(chat_id) + ": " + fact)
-    context.bot.sendMessage(chat_id, fact)
+    fetch_fact = get_random_fact()
+    logger.info("Sending fact to " + str(chat_id) + ": " + fetch_fact)
+    context.bot.sendMessage(chat_id, fetch_fact)
+
+
+def error(update, context):
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
